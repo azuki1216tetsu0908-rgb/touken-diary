@@ -1,4 +1,4 @@
-const CACHE="touken-diary-v14";
+const CACHE="touken-diary-v15";
 const ASSETS=["./","./index.html","./manifest.webmanifest","./icon.svg"];
 
 self.addEventListener("install", event => {
