@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="刀帳日記">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon.svg">
-<title>刀帳日記 v15</title>
+<title>刀帳日記 v17</title>
 <style>
 :root{--ink:#20252b;--muted:#747b83;--paper:#fbfaf6;--card:#fff;--line:#e5e1d8;--navy:#172536;--pink:#b87886;--green:#5f8b76;--red:#b55f65;--shadow:0 5px 20px rgba(25,34,45,.08)}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#f5f2eb,#fbfaf6 45%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;-webkit-tap-highlight-color:transparent}
@@ -24,6 +24,7 @@ main{padding:16px}.page{display:none}.page.active{display:block}.hero{background
 input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px;background:#fff;color:var(--ink);outline:none}textarea{min-height:80px;resize:vertical}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{display:block;font-size:11px;color:var(--muted);margin:0 0 5px}.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}.actions .btn{flex:1}
 .bottom{position:fixed;bottom:0;left:0;right:0;z-index:10;background:rgba(255,255,255,.96);border-top:1px solid var(--line);backdrop-filter:blur(14px)}.bottom-inner{max-width:760px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr)}.navbtn{border:0;background:transparent;padding:9px 3px 10px;color:#7a7f84;font-size:10px}.navbtn.active{color:var(--navy);font-weight:700}.navicon{display:block;font-size:18px;margin-bottom:2px}
 .search{margin-bottom:10px}.empty{text-align:center;padding:25px;color:var(--muted);font-size:13px}.sakura{color:var(--pink)}.right{margin-left:auto}.fav{color:#c58a28}.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{padding:9px 5px;border-bottom:1px solid var(--line);text-align:right}.table th:first-child,.table td:first-child{text-align:left}.chart{height:190px;overflow:hidden;border:1px solid var(--line);border-radius:14px;background:#fcfbf8}.chart svg{width:100%;height:100%}.notice{font-size:11px;color:var(--muted);line-height:1.7}
+.goal-list{display:flex;flex-direction:column;gap:12px}.goal-head{display:flex;justify-content:space-between;gap:10px;align-items:baseline}.goal-track{height:12px;background:#f5e5ea;border-radius:999px;overflow:hidden;margin-top:6px}.goal-fill{height:100%;background:linear-gradient(90deg,#e58aa4,#d85f83);border-radius:999px;transition:width .25s}.goal-done{font-weight:700;color:#b64f70}.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.goal-grid .field:last-child{grid-column:1/-1}
 @media(max-width:420px){.grid4{gap:5px}.resource{padding:9px 3px}.resource .num{font-size:14px}.formgrid{grid-template-columns:1fr}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -94,13 +95,35 @@ function renderHome(){
 }
 function resourceCards(r,ds){
  const names=[["wood","木炭"],["steel","玉鋼"],["cool","冷却材"],["stone","砥石"],["koushu","甲州金"],["koban","小判"]];
- return '<div class="grid4">'+names.map(([k,n],i)=>`<div class="resource"><div class="label">${n}</div><div class="num">${fmt(r[k])}</div>${ds?`<div class="delta ${deltaClass(ds[i])}">${ds[i]>0?"+":""}${fmt(ds[i])}</div>`:""}</div>`).join('')+'</div><div class="muted" style="margin-top:9px">記録日：${esc(r.date)}${r.note?"　・ "+esc(r.note):""}</div>';
+ return '<div class="grid4">'+names.map(([k,n],i)=>`<div class="resource"><div class="label">${n}</div><div class="num">${fmt(r[k])}</div>${ds?`<div class="delta ${deltaClass(ds[i])}">${ds[i]>0?"+":""}${fmt(ds[i])}</div>`:""}</div>`).join('')+'</div>';
+}
+const GOAL_RESOURCES=[["wood","木炭"],["steel","玉鋼"],["cool","冷却材"],["stone","砥石"],["koban","小判"]];
+function resourceGoals(){return {...(db.settings?.resourceGoals||{})}}
+function renderGoalGauges(){
+ const r=latestResource(), goals=resourceGoals();
+ if(!r)return '<div class="card"><h2>資材目標</h2><div class="empty">資材を記録すると、ここに目標ゲージが表示されます。</div><button class="btn secondary full" onclick="openGoalForm()">目標を設定</button></div>';
+ const rows=GOAL_RESOURCES.map(([k,n])=>{const goal=Number(goals[k]||0),cur=Number(r[k]||0);if(!goal)return '';
+  const pct=Math.min(100,Math.max(0,cur/goal*100)),done=cur>=goal;
+  return `<div><div class="goal-head"><b>${n}</b><span class="small ${done?'goal-done':''}">${fmt(cur)} / ${fmt(goal)}　${(cur/goal*100).toFixed(1)}%${done?' 💮':''}</span></div><div class="goal-track"><div class="goal-fill" style="width:${pct}%"></div></div></div>`}).filter(Boolean).join('');
+ return `<div class="card"><div class="row"><h2>資材目標</h2><button class="btn secondary icon" onclick="openGoalForm()">目標を設定</button></div>${rows?`<div class="goal-list">${rows}</div>`:'<div class="empty">まだ目標が設定されていません。</div>'}</div>`;
+}
+function openGoalForm(){
+ const goals=resourceGoals();
+ const fields=GOAL_RESOURCES.map(([k,n])=>`<div class="field"><label>${n}</label><input id="goal_${k}" type="number" inputmode="numeric" min="0" value="${goals[k]||''}" placeholder="未設定"></div>`).join('');
+ const old=document.getElementById('goalForm');if(old)old.remove();
+ const wrap=document.createElement('div');wrap.id='goalForm';wrap.className='card';wrap.innerHTML=`<h2>資材目標を設定</h2><div class="notice">空欄または0にすると、その資材のゲージを非表示にできます。目標はいつでも変更できます。</div><div class="goal-grid" style="margin-top:10px">${fields}</div><div class="actions"><button class="btn secondary" onclick="document.getElementById('goalForm')?.remove()">キャンセル</button><button class="btn" onclick="saveResourceGoals()">保存</button></div>`;
+ const page=document.getElementById('resources');const tabs=page.querySelector('.tabs');tabs.insertAdjacentElement('afterend',wrap);wrap.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function saveResourceGoals(){
+ const goals={};GOAL_RESOURCES.forEach(([k])=>{const v=Math.max(0,Number(document.getElementById(`goal_${k}`)?.value)||0);if(v)goals[k]=v});
+ db.settings={...(db.settings||{}),resourceGoals:goals};save();showPage('resources');
 }
 function renderResources(){
  const sorted=[...db.resources].sort((a,b)=>b.date.localeCompare(a.date));
  document.getElementById("resources").innerHTML=`
  <div class="row"><div><h1 style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:23px;margin:0">資材記録</h1><div class="muted">スクショ2枚から6つの資源を自動読み取りできます。</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><label class="btn" style="white-space:nowrap">📸 資材読取<input id="resourceShotInput" type="file" accept="image/*" onchange="readResourceScreenshot(event)" style="display:none"></label><label class="btn" style="white-space:nowrap">📸 小判読取<input id="kobanShotInput" type="file" accept="image/*" onchange="readKobanScreenshot(event)" style="display:none"></label><button class="btn secondary" onclick="openResourceForm()">＋手入力</button></div></div>
  <div class="tabs" style="margin-top:13px"><button class="${resourceMode==='list'?'active':''}" onclick="resourceMode='list';renderResources()">一覧</button><button class="${resourceMode==='chart'?'active':''}" onclick="resourceMode='chart';renderResources()">グラフ</button></div>
+ ${renderGoalGauges()}
  ${resourceMode==='chart'?resourceChart(sorted):`<div class="card"><div class="notice">前回の記録がある日は、増減も自動計算します。</div></div>
  <div class="list">${sorted.length?sorted.map((r,i)=>{let p=latestResBefore(r.date),d=resDelta(r,p);return `<div class="item"><div class="row"><b>${esc(r.date)}</b><button class="btn secondary icon" onclick="editResource('${r.id}')">編集</button></div>${resourceCards(r,d)}</div>`}).join(""):'<div class="empty">記録がありません。</div>'}</div>`}`;
 }
@@ -453,7 +476,7 @@ function renderAll(){renderHome();renderResources();renderSwords();renderDaily()
 if("serviceWorker" in navigator){
  window.addEventListener("load",async()=>{
    try{
-     const reg=await navigator.serviceWorker.register("sw.js?v=15",{updateViaCache:"none"});
+     const reg=await navigator.serviceWorker.register("sw.js?v=17",{updateViaCache:"none"});
      if(reg.waiting) reg.waiting.postMessage({type:"SKIP_WAITING"});
      navigator.serviceWorker.addEventListener("controllerchange",()=>{
        if(!window.__swReloaded){window.__swReloaded=true;window.location.reload();}
