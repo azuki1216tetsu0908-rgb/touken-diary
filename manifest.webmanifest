@@ -1,0 +1,9 @@
+{
+  "name":"刀帳日記",
+  "short_name":"刀帳日記",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#fbfaf6",
+  "theme_color":"#d85f83",
+  "lang":"ja"
+}

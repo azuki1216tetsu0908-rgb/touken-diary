@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5a7bd"/><stop offset="1" stop-color="#d75e83"/></linearGradient></defs>
+<rect width="180" height="180" rx="40" fill="url(#g)"/>
+<circle cx="90" cy="82" r="54" fill="#fff4f6" opacity=".94"/>
+<path d="M36 111c30-17 77-19 111 4" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="5"/>
+<path d="M42 112L134 58" stroke="#713c4d" stroke-width="9" stroke-linecap="round"/>
+<path d="M57 105l15 10" stroke="#a84e6c" stroke-width="13" stroke-linecap="round"/>
+<circle cx="63" cy="100" r="13" fill="#f4c7d3" stroke="#9e5068" stroke-width="3"/>
+<path d="M57 100l6-6 6 6-6 6z" fill="#fff"/>
+<text x="90" y="71" text-anchor="middle" font-family="serif" font-weight="700" font-size="25" fill="#633b49">刀帳日記</text>
+<g fill="#ef91aa"><circle cx="28" cy="35" r="5"/><circle cx="149" cy="31" r="4"/><circle cx="154" cy="122" r="5"/></g>
+<g fill="#fff2f5"><path d="M27 48c-10-7-18 4-9 10 9 6 9 6 9 6s0-9 9-15c6-4 0-14-9-1z"/><path d="M151 143c-9-7-17 4-8 10 9 6 9 6 9 6s0-9 9-15c6-4 0-14-10-1z"/></g>
+</svg>

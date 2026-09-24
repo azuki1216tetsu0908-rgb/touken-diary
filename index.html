@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d85f83">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="刀帳日記">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>刀帳日記 v14</title>
+<style>
+:root{--ink:#20252b;--muted:#747b83;--paper:#fbfaf6;--card:#fff;--line:#e5e1d8;--navy:#172536;--pink:#b87886;--green:#5f8b76;--red:#b55f65;--shadow:0 5px 20px rgba(25,34,45,.08)}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#f5f2eb,#fbfaf6 45%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:760px;margin:auto;min-height:100vh;padding-bottom:84px}
+header{padding:22px 18px 12px;position:sticky;top:0;z-index:5;background:rgba(251,250,246,.94);backdrop-filter:blur(12px);border-bottom:1px solid rgba(229,225,216,.7)}
+.brand{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:24px;font-weight:700;letter-spacing:.08em}.sub{font-size:11px;color:var(--muted);letter-spacing:.12em;margin-top:3px}
+main{padding:16px}.page{display:none}.page.active{display:block}.hero{background:linear-gradient(135deg,#1c2c40,#263c53);color:white;border-radius:22px;padding:20px;box-shadow:var(--shadow);margin-bottom:14px}
+.hero h1{margin:0 0 6px;font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:23px}.hero p{margin:0;color:#dbe3ea;font-size:13px}.date{font-size:12px;opacity:.8;margin-bottom:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.resource{background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:15px;padding:11px 8px;text-align:center}.resource .label{font-size:11px;color:var(--muted)}.resource .num{font-weight:700;font-size:16px;margin-top:4px}.delta{font-size:11px;margin-top:4px}.up{color:var(--green)}.down{color:var(--red)}.flat{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;margin:12px 0;box-shadow:var(--shadow)}.card h2{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:17px;margin:0 0 12px}.row{display:flex;justify-content:space-between;gap:12px;align-items:center}.list{display:flex;flex-direction:column;gap:8px}.item{padding:12px;border:1px solid var(--line);border-radius:14px;background:#fff}.muted{color:var(--muted);font-size:12px}.small{font-size:12px}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:11px;background:#faf9f5;margin:2px}.btn{border:0;border-radius:12px;padding:10px 13px;background:var(--navy);color:#fff;font-weight:650}.btn.secondary{background:#f0eee8;color:var(--ink)}.btn.danger{background:#a64d57}.btn.icon{padding:8px 10px}.btn.full{width:100%}
+.tabs{display:flex;gap:6px;background:#eeeae2;border-radius:13px;padding:4px;margin-bottom:12px}.tabs button{flex:1;border:0;background:transparent;border-radius:10px;padding:9px;color:var(--muted)}.tabs button.active{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px;background:#fff;color:var(--ink);outline:none}textarea{min-height:80px;resize:vertical}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{display:block;font-size:11px;color:var(--muted);margin:0 0 5px}.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}.actions .btn{flex:1}
+.bottom{position:fixed;bottom:0;left:0;right:0;z-index:10;background:rgba(255,255,255,.96);border-top:1px solid var(--line);backdrop-filter:blur(14px)}.bottom-inner{max-width:760px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr)}.navbtn{border:0;background:transparent;padding:9px 3px 10px;color:#7a7f84;font-size:10px}.navbtn.active{color:var(--navy);font-weight:700}.navicon{display:block;font-size:18px;margin-bottom:2px}
+.search{margin-bottom:10px}.empty{text-align:center;padding:25px;color:var(--muted);font-size:13px}.sakura{color:var(--pink)}.right{margin-left:auto}.fav{color:#c58a28}.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{padding:9px 5px;border-bottom:1px solid var(--line);text-align:right}.table th:first-child,.table td:first-child{text-align:left}.chart{height:190px;overflow:hidden;border:1px solid var(--line);border-radius:14px;background:#fcfbf8}.chart svg{width:100%;height:100%}.notice{font-size:11px;color:var(--muted);line-height:1.7}
+@media(max-width:420px){.grid4{gap:5px}.resource{padding:9px 3px}.resource .num{font-size:14px}.formgrid{grid-template-columns:1fr}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<style>
+:root{--ink:#34262c;--muted:#82757b;--paper:#fff8fa;--card:#fffdfd;--line:#ead8de;--navy:#d85f83;--pink:#d85f83;--green:#5f8b76;--red:#b55f65;--shadow:0 5px 20px rgba(150,80,105,.10)}
+body{background:linear-gradient(180deg,#fff3f6,#fffafa 45%)}
+header{background:rgba(255,250,251,.94);border-bottom-color:#f0dfe4}
+.hero{background:linear-gradient(135deg,#dc7190,#e994aa);box-shadow:0 8px 24px rgba(210,95,130,.18)}
+.btn{background:var(--pink)}.btn.secondary{background:#f8e9ee;color:#5b424b}.btn.danger{background:#b85b6c}
+.tabs{background:#f7e9ee}.tabs button.active{color:#7c3e53}
+.bottom{background:rgba(255,250,252,.96);border-top-color:#eddce1}.navbtn.active{color:var(--pink)}
+.resource{border-color:#eddce1}.item{border-color:#ead8de}.card{border-color:#ead8de}
+.sakura{color:var(--pink)}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="brand">刀帳日記</div><div class="sub">資材と、育成の記録を、ともに。</div></header>
+<main>
+<section id="home" class="page active"></section>
+<section id="resources" class="page"></section>
+<section id="swords" class="page"></section>
+<section id="daily" class="page"></section>
+<section id="settings" class="page"></section>
+</main>
+</div>
+<nav class="bottom"><div class="bottom-inner">
+<button class="navbtn active" data-page="home"><span class="navicon">⌂</span>ホーム</button>
+<button class="navbtn" data-page="resources"><span class="navicon">▣</span>資材</button>
+<button class="navbtn" data-page="swords"><span class="navicon">♙</span>男士</button>
+<button class="navbtn" data-page="daily"><span class="navicon">▤</span>日記</button>
+<button class="navbtn" data-page="settings"><span class="navicon">•••</span>その他</button>
+</div></nav>
+
+<script>
+const KEY="toukenDiary_v1";
+const empty={resources:[],swords:[],levels:[],memos:[],settings:{theme:"light"}};
+const MASTER_SWORDS=["今剣", "平野藤四郎", "厚藤四郎", "後藤藤四郎", "信濃藤四郎", "前田藤四郎", "秋田藤四郎", "博多藤四郎", "乱藤四郎", "五虎退", "薬研藤四郎", "包丁藤四郎", "愛染国俊", "太鼓鐘貞宗", "小夜左文字", "不動行光", "毛利藤四郎", "謙信景光", "日向正宗", "北谷菜切", "太閤左文字", "京極正宗", "九鬼正宗", "倶利伽羅江", "にっかり青江", "鯰尾藤四郎", "骨喰藤四郎", "物吉貞宗", "堀川国広", "浦島虎徹", "篭手切江", "肥前忠広", "治金丸", "泛塵", "火車切", "鳴狐", "千子村正", "亀甲貞宗", "宗三左文字", "加州清光", "大和守安定", "歌仙兼定", "和泉守兼定", "陸奥守吉行", "山姥切国広", "蜂須賀虎徹", "長曽祢虎徹", "大倶利伽羅", "へし切長谷部", "同田貫正国", "南泉一文字", "山姥切長義", "豊前江", "南海太郎朝尊", "桑名江", "水心子正秀", "源清麿", "松井江", "地蔵行平", "五月雨江", "村雲江", "稲葉江", "石田正宗", "孫六兼元", "後家兼光", "富田江", "大慶直胤", "安宅切", "二筋樋貞宗", "雲重", "童子切安綱 剥落", "三日月宗近", "小狐丸", "大典太光世", "ソハヤノツルキ", "数珠丸恒次", "鬼丸国綱", "一期一振", "大包平", "鶯丸", "明石国行", "燭台切光忠", "大般若長光", "小竜景光", "江雪左文字", "山伏国広", "髭切", "膝丸", "獅子王", "小烏丸", "抜丸", "鶴丸国永", "小豆長光", "千代金丸", "山鳥毛", "古今伝授の太刀", "日光一文字", "一文字則宗", "姫鶴一文字", "福島光忠", "笹貫", "八丁念仏", "実休光忠", "雲生", "道誉一文字", "雲次", "面影", "古備前信房", "三郎国宗", "波平行安", "狐ヶ崎為次", "石切丸", "蛍丸", "太郎太刀", "次郎太刀", "祢々切丸", "柏太刀", "蜻蛉切", "日本号", "御手杵", "大千鳥十文字槍", "人間無骨", "岩融", "巴形薙刀", "静形薙刀", "白山吉光", "七星剣", "丙子椒林剣"];
+let db=load(); let currentPage="home"; let resourceMode="list"; let editingSword=null;
+function load(){try{const x={...empty,...JSON.parse(localStorage.getItem(KEY)||"{}")};x.resources=(x.resources||[]).map(r=>({...r,koushu:r.koushu??"",koban:r.koban??""}));return x}catch(e){return {...empty}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(db)); renderAll()}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function fmt(n){return Number(n||0).toLocaleString("ja-JP")}
+function today(){return new Date().toISOString().slice(0,10)}
+function jpDate(d){return new Date(d+"T00:00:00").toLocaleDateString("ja-JP",{year:"numeric",month:"numeric",day:"numeric",weekday:"short"})}
+function deltaClass(n){return n>0?"up":n<0?"down":"flat"}
+function resDelta(r,prev){if(!prev)return null;return ["wood","steel","cool","stone","koushu","koban"].map(k=>Number(r[k]||0)-Number(prev[k]||0))}
+function latestResource(){return [...db.resources].sort((a,b)=>b.date.localeCompare(a.date))[0]}
+function latestResBefore(date){return [...db.resources].filter(r=>r.date<date).sort((a,b)=>b.date.localeCompare(a.date))[0]}
+function todayLevels(){return db.levels.filter(x=>x.date===today())}
+function swordName(id){return db.swords.find(s=>s.id===id)?.name||"不明"}
+function renderHome(){
+ const r=latestResource(), prev=r&&latestResBefore(r.date), ds=r&&resDelta(r,prev);
+ const lv=todayLevels();
+ document.getElementById("home").innerHTML=`
+ <div class="hero"><div class="date">${jpDate(today())}</div><h1>今日も、よく頑張りました。</h1><p>資材と男士の歩みを、ひとつずつ残していこう。</p></div>
+ <div class="card"><div class="row"><h2>本日の資材</h2><button class="btn icon" onclick="showPage('resources');setTimeout(()=>openResourceForm(),50)">＋記録</button></div>
+ ${r?resourceCards(r,ds):'<div class="empty">まだ資材記録がありません。<br>最初の記録をつけてみよう。</div>'}</div>
+ <div class="card"><div class="row"><h2>本日のLvUP</h2><span class="muted">${lv.length}件</span></div>
+ ${lv.length?'<div class="list">'+lv.map(x=>`<div class="item"><div class="row"><b>${esc(swordName(x.swordId))}</b><span class="pill">Lv.${x.level}</span></div><div class="muted">${esc(x.note||"")}</div></div>`).join('')+'</div>':'<div class="empty">今日のLv記録はまだありません。</div>'}</div>
+ <div class="card"><h2>記録サマリー</h2><div class="grid4">
+ <div class="resource"><div class="label">男士</div><div class="num">${db.swords.length}</div></div>
+ <div class="resource"><div class="label">Lv記録</div><div class="num">${db.levels.length}</div></div>
+ <div class="resource"><div class="label">資材日数</div><div class="num">${db.resources.length}</div></div>
+ <div class="resource"><div class="label">お迎え</div><div class="num">${db.swords.filter(s=>s.acquired).length}</div></div>
+ </div></div>`;
+}
+function resourceCards(r,ds){
+ const names=[["wood","木炭"],["steel","玉鋼"],["cool","冷却材"],["stone","砥石"],["koushu","甲州金"],["koban","小判"]];
+ return '<div class="grid4">'+names.map(([k,n],i)=>`<div class="resource"><div class="label">${n}</div><div class="num">${fmt(r[k])}</div>${ds?`<div class="delta ${deltaClass(ds[i])}">${ds[i]>0?"+":""}${fmt(ds[i])}</div>`:""}</div>`).join('')+'</div><div class="muted" style="margin-top:9px">記録日：${esc(r.date)}${r.note?"　・ "+esc(r.note):""}</div>';
+}
+function renderResources(){
+ const sorted=[...db.resources].sort((a,b)=>b.date.localeCompare(a.date));
+ document.getElementById("resources").innerHTML=`
+ <div class="row"><div><h1 style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:23px;margin:0">資材記録</h1><div class="muted">スクショ2枚から6つの資源を自動読み取りできます。</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><label class="btn" style="white-space:nowrap">📸 資材読取<input id="resourceShotInput" type="file" accept="image/*" onchange="readResourceScreenshot(event)" style="display:none"></label><label class="btn" style="white-space:nowrap">📸 小判読取<input id="kobanShotInput" type="file" accept="image/*" onchange="readKobanScreenshot(event)" style="display:none"></label><button class="btn secondary" onclick="openResourceForm()">＋手入力</button></div></div>
+ <div class="tabs" style="margin-top:13px"><button class="${resourceMode==='list'?'active':''}" onclick="resourceMode='list';renderResources()">一覧</button><button class="${resourceMode==='chart'?'active':''}" onclick="resourceMode='chart';renderResources()">グラフ</button></div>
+ ${resourceMode==='chart'?resourceChart(sorted):`<div class="card"><div class="notice">前回の記録がある日は、増減も自動計算します。</div></div>
+ <div class="list">${sorted.length?sorted.map((r,i)=>{let p=latestResBefore(r.date),d=resDelta(r,p);return `<div class="item"><div class="row"><b>${esc(r.date)}</b><button class="btn secondary icon" onclick="editResource('${r.id}')">編集</button></div>${resourceCards(r,d)}</div>`}).join(""):'<div class="empty">記録がありません。</div>'}</div>`}`;
+}
+function resourceChart(arr){
+ if(arr.length<2)return '<div class="card"><div class="empty">グラフには2日以上の資材記録が必要です。</div></div>';
+ const data=arr.slice().reverse().slice(-30), W=700,H=180,p=24, keys=["wood","steel","cool","stone","koushu","koban"], max=Math.max(...data.flatMap(x=>keys.map(k=>+x[k]||0))), min=Math.min(...data.flatMap(x=>keys.map(k=>+x[k]||0))), range=max-min||1;
+ const pts=k=>data.map((x,i)=>`${p+i*(W-2*p)/(data.length-1)},${H-p-((x[k]-min)/range)*(H-2*p)}`).join(" ");
+ return `<div class="card"><div class="chart"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><line x1="${p}" y1="${p}" x2="${p}" y2="${H-p}" stroke="#ddd"/><line x1="${p}" y1="${H-p}" x2="${W-p}" y2="${H-p}" stroke="#ddd"/><polyline points="${pts("wood")}" fill="none" stroke="#333" stroke-width="3"/><polyline points="${pts("steel")}" fill="none" stroke="#b87886" stroke-width="3"/><polyline points="${pts("cool")}" fill="none" stroke="#5f8b76" stroke-width="3"/><polyline points="${pts("stone")}" fill="none" stroke="#6e82a0" stroke-width="3"/><polyline points="${pts("koushu")}" fill="none" stroke="#c58a28" stroke-width="3"/><polyline points="${pts("koban")}" fill="none" stroke="#8b5a2b" stroke-width="3"/></svg></div><div class="small" style="margin-top:8px">━ 木炭　━ 玉鋼　━ 冷却材　━ 砥石　━ 甲州金　━ 小判</div><div class="muted">${data[0].date} ～ ${data[data.length-1].date}</div></div>`;
+}
+
+async function readResourceScreenshot(event){
+ const file=event.target.files?.[0]; if(!file)return;
+ const wrap=document.createElement("div"); wrap.id="ocrProgress"; wrap.className="card";
+ wrap.innerHTML='<h2>📸 資材・甲州金を読み取り中…</h2><div class="notice">上部バーの木炭・玉鋼・冷却材・砥石・甲州金を読み取ります。6桁・7桁どちらにも対応しています。</div><div id="ocrStatus" class="muted" style="margin-top:8px">準備中…</div>';
+ document.getElementById("resources").prepend(wrap);
+ try{
+   const img=await loadImage(file);
+   const src=normalizeLandscape(img);
+   document.getElementById("ocrStatus").textContent="上部バーを解析中…";
+
+   // 実際の刀剣乱舞ホーム画面（1334×750）を基準にした数値部分。
+   // v13では玉鋼以降のX位置が右にずれており、数字の先頭を切ってしまう場合があった。
+   // ここでは各枠を少し広めに取り、6桁・7桁を許容する。
+   const boxes=[
+     [0.300,0.010,0.080,0.072,"木炭",6,7],
+     [0.388,0.010,0.098,0.072,"玉鋼",6,7],
+     [0.490,0.010,0.098,0.072,"冷却材",6,7],
+     [0.605,0.010,0.100,0.072,"砥石",6,7],
+     [0.715,0.010,0.055,0.072,"甲州金",1,3]
+   ];
+   const vals=[];
+   for(const [rx,ry,rw,rh,name,minLen,maxLen] of boxes){
+     document.getElementById("ocrStatus").textContent=`${name}を読み取り中…`;
+     vals.push(await readNumberCropFlexible(src,rx,ry,rw,rh,minLen,maxLen,name));
+   }
+
+   wrap.remove();
+   openResourceForm({date:today(),wood:vals[0]||"",steel:vals[1]||"",cool:vals[2]||"",stone:vals[3]||"",koushu:vals[4]||"",koban:"",note:"スクショから読み取り（資材・甲州金）"});
+   const notice=document.createElement("div"); notice.className="card"; notice.innerHTML='<b>📸 読み取り結果を確認してください</b><div class="notice">6桁・7桁の資材と甲州金を読み取っています。OCRは誤認識することがあるので、保存前に数字を確認・修正できます。</div>';
+   document.getElementById("resourceForm").prepend(notice);
+ }catch(e){
+   console.error(e);
+   wrap.innerHTML='<h2>読み取りできませんでした</h2><div class="notice">画像を確認できませんでした。もう一度試すか、＋手入力をご利用ください。</div>';
+ }
+ event.target.value="";
+}
+
+function normalizeLandscape(img){
+  if(img.width>=img.height) return img;
+  const c=document.createElement("canvas"); c.width=img.height; c.height=img.width;
+  const ctx=c.getContext("2d");
+  ctx.translate(c.width,0); ctx.rotate(Math.PI/2); ctx.drawImage(img,0,0);
+  return c;
+}
+
+async function readNumberCropFlexible(img,rx,ry,rw,rh,minLen,maxLen,name){
+ const scale=6;
+ const sx=Math.round(img.width*rx), sy=Math.round(img.height*ry);
+ const sw=Math.round(img.width*rw), sh=Math.round(img.height*rh);
+ let best="", bestScore=-Infinity;
+ // 同じ枠でも少しずつ左右をずらして、端の数字が切れないようにする。
+ const xOffsets=[-0.015,0,0.015];
+ for(const off of xOffsets){
+   const x=Math.max(0,Math.min(img.width-1,sx+Math.round(img.width*off)));
+   const w=Math.min(img.width-x,sw);
+   const c=document.createElement("canvas"); c.width=w*scale; c.height=sh*scale;
+   const ctx=c.getContext("2d"); ctx.imageSmoothingEnabled=true;
+   ctx.drawImage(img,x,sy,w,sh,0,0,c.width,c.height);
+   const base=ctx.getImageData(0,0,c.width,c.height);
+   const variants=[];
+   for(const threshold of [125,150,175,200]){
+     const v=new ImageData(new Uint8ClampedArray(base.data),base.width,base.height), d=v.data;
+     for(let i=0;i<d.length;i+=4){
+       const g=.299*d[i]+.587*d[i+1]+.114*d[i+2]; const b=g>threshold?255:0;
+       d[i]=d[i+1]=d[i+2]=b; d[i+3]=255;
+     }
+     const cc=document.createElement("canvas"); cc.width=v.width; cc.height=v.height; cc.getContext("2d").putImageData(v,0,0); variants.push(cc);
+   }
+   for(const cc of variants){
+     for(const psm of [7,8,13]){
+       const result=await Tesseract.recognize(cc,"eng",{
+         logger:m=>{if(m.status==="recognizing text"){const el=document.getElementById("ocrStatus")||document.getElementById("kobanOcrStatus");if(el)el.textContent=`${name}を読み取り中… ${Math.round((m.progress||0)*100)}%`; }},
+         tessedit_pageseg_mode:String(psm),
+         tessedit_char_whitelist:"0123456789, "
+       });
+       const text=result.data.text||"";
+       const candidates=[...text.matchAll(/\d[\d,\s]{0,15}/g)].map(m=>m[0].replace(/[^0-9]/g,""));
+       for(let val of candidates){
+         if(!val) continue;
+         // 連続して拾った数字が長すぎる場合、枠内で成立する末尾/先頭候補を試す。
+         const tries=[val];
+         if(val.length>maxLen){
+           for(let n=minLen;n<=maxLen;n++){
+             tries.push(val.slice(0,n),val.slice(-n));
+           }
+         }
+         for(const cand of tries){
+           if(cand.length<minLen || cand.length>maxLen) continue;
+           let score=0;
+           if(cand.length===6) score+=70;
+           if(cand.length===7) score+=85;
+           if(minLen<=1 && maxLen===3) score=100-cand.length; // 甲州金は短い数字を優先
+           // カンマ付きの数字をTesseractが認識できた候補は少し加点。
+           if(/[\d],[\d]/.test(text)) score+=5;
+           // OCRの信頼度が取れる場合も利用する。
+           if(typeof result.data.confidence==="number") score+=result.data.confidence/10;
+           if(score>bestScore){bestScore=score;best=cand;}
+         }
+       }
+     }
+   }
+ }
+ return best;
+}
+
+async function readKobanScreenshot(event){
+ const file=event.target.files?.[0]; if(!file)return;
+ const wrap=document.createElement("div"); wrap.id="kobanOcrProgress"; wrap.className="card";
+ wrap.innerHTML='<h2>📸 小判を読み取り中…</h2><div class="notice">「所持」の右側に表示されている小判枚数を読み取ります。</div><div id="kobanOcrStatus" class="muted" style="margin-top:8px">準備中…</div>';
+ document.getElementById("resources").prepend(wrap);
+ try{
+   const img=await loadImage(file);
+   // 景趣入手画面の左下「所持 1,439,596 枚」の数値部分。6〜8桁を許容。
+   const val=await readNumberCropFlexible(img,0.125,0.875,0.145,0.075,6,8,"小判");
+   wrap.remove();
+   openResourceForm({date:today(),wood:"",steel:"",cool:"",stone:"",koushu:"",koban:val||"",note:"スクショから読み取り（小判）"});
+   const notice=document.createElement("div"); notice.className="card"; notice.innerHTML='<b>📸 小判の読み取り結果を確認してください</b><div class="notice">「所持」の枚数を読み取っています。保存前に修正できます。資材・甲州金は必要なら手入力してください。</div>';
+   document.getElementById("resourceForm").prepend(notice);
+ }catch(e){
+   console.error(e);
+   wrap.innerHTML='<h2>読み取りできませんでした</h2><div class="notice">画像を確認できませんでした。もう一度試すか、＋手入力をご利用ください。</div>';
+ }
+ event.target.value="";
+}
+function loadImage(file){
+ return new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=URL.createObjectURL(file)});
+}
+function openResourceForm(existing){
+ const r=existing||{date:today(),wood:"",steel:"",cool:"",stone:"",koushu:"",koban:"",note:""};
+ document.getElementById("resources").innerHTML+=`<div id="resourceForm" class="card"><h2>${existing?'資材記録を編集':'資材を記録'}</h2><div class="field"><label>日付</label><input id="r_date" type="date" value="${r.date}"></div><div class="formgrid" style="margin-top:10px">
+ <div class="field"><label>木炭</label><input id="r_wood" type="number" inputmode="numeric" value="${r.wood??""}"></div><div class="field"><label>玉鋼</label><input id="r_steel" type="number" inputmode="numeric" value="${r.steel??""}"></div>
+ <div class="field"><label>冷却材</label><input id="r_cool" type="number" inputmode="numeric" value="${r.cool??""}"></div><div class="field"><label>砥石</label><input id="r_stone" type="number" inputmode="numeric" value="${r.stone??""}"></div>
+ <div class="field"><label>甲州金</label><input id="r_koushu" type="number" inputmode="numeric" value="${r.koushu??""}"></div><div class="field"><label>小判</label><input id="r_koban" type="number" inputmode="numeric" value="${r.koban??""}"></div></div>
+ <div class="field" style="margin-top:10px"><label>メモ</label><textarea id="r_note">${esc(r.note||"")}</textarea></div>
+ <div class="actions"><button class="btn secondary" onclick="document.getElementById('resourceForm')?.remove()">キャンセル</button><button class="btn" onclick="saveResource('${existing?.id||""}')">保存</button></div></div>`;
+ document.getElementById("resourceForm").scrollIntoView({behavior:"smooth",block:"center"});
+}
+function saveResource(id){
+ const x={id:id||crypto.randomUUID(),date:document.getElementById("r_date").value,wood:+document.getElementById("r_wood").value||0,steel:+document.getElementById("r_steel").value||0,cool:+document.getElementById("r_cool").value||0,stone:+document.getElementById("r_stone").value||0,koushu:+document.getElementById("r_koushu").value||0,koban:+document.getElementById("r_koban").value||0,note:document.getElementById("r_note").value.trim()};
+ if(!x.date)return alert("日付を入力してください。");
+ db.resources=db.resources.filter(r=>r.id!==x.id);db.resources.push(x);save();showPage("resources");
+}
+function editResource(id){const r=db.resources.find(x=>x.id===id);if(r)openResourceForm(r)}
+let swordMode="owned";
+function renderSwords(){
+ const q=(document.getElementById("swordSearch")?.value||"").toLowerCase();
+ if(editingSword){renderSwordForm(editingSword);return}
+ const owned=db.swords.filter(s=>!q||s.name.toLowerCase().includes(q)).sort((a,b)=>(b.favorite?1:0)-(a.favorite?1:0)||a.name.localeCompare(b.name));
+ const ownedNames=new Set(db.swords.map(s=>s.name));
+ const catalog=MASTER_SWORDS.filter(n=>!q||n.toLowerCase().includes(q));
+ const list=swordMode==="owned"?owned:catalog;
+ document.getElementById("swords").innerHTML=`
+ <div class="row"><div><h1 style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:23px;margin:0">男士一覧</h1><div class="muted">スクショからLvも読み取れます。</div></div><div style="display:flex;gap:6px"><label class="btn" style="white-space:nowrap">📸 Lv読取<input id="levelShotInput" type="file" accept="image/*" onchange="readLevelScreenshot(event)" style="display:none"></label><button class="btn secondary" onclick="editingSword={};renderSwords()">＋追加</button></div></div>
+ <div class="search" style="margin-top:12px"><input id="swordSearch" placeholder="男士を検索…" value="${esc(q)}" oninput="renderSwords()"></div>
+ <div class="tabs"><button class="${swordMode==='owned'?'active':''}" onclick="swordMode='owned';renderSwords()">所持・育成中 <span class="muted">(${owned.length})</span></button><button class="${swordMode==='catalog'?'active':''}" onclick="swordMode='catalog';renderSwords()">刀帳 <span class="muted">(${MASTER_SWORDS.length})</span></button></div>
+ ${swordMode==="owned"?`
+ <div class="list">${list.length?list.map(s=>`<div class="item" onclick="openSword('${s.id}')"><div class="row"><div><b>${s.favorite?'★ ':''}${esc(s.name)}</b><div class="muted">Lv.${latestLevel(s.id)?.level??s.startLevel??'—'}　・ ${s.acquired?`お迎え ${esc(s.acquired)}`:"お迎え日未登録"}</div></div><span>›</span></div></div>`).join(""):'<div class="empty">まだ所持記録がありません。<br>「刀帳」から登録すると、すぐ記録を始められます。</div>'}</div>`
+ :`
+ <div class="card"><div class="notice">ここには現在実装済みの128振りを登録してあります。未所持でもOK。名前をタップすると、その男士を1振り登録できます。二振り目以降も同じ名前から追加できます。</div></div>
+ <div class="list">${list.map(n=>`<div class="item" onclick="quickRegisterMaster('${encodeURIComponent(n)}')"><div class="row"><div><b>${esc(n)}</b><div class="muted">${ownedNames.has(n)?'登録済みの個体あり':'未登録'}</div></div><span>＋</span></div></div>`).join("")}</div>`}`;
+}
+function quickRegisterMaster(encoded){
+ const name=decodeURIComponent(encoded);
+ editingSword={presetName:name};
+ renderSwordForm(editingSword);
+}
+function latestLevel(id){return [...db.levels].filter(x=>x.swordId===id).sort((a,b)=>b.date.localeCompare(a.date))[0]}
+function renderSwordForm(s){
+ const preset=s.presetName||s.name||"";
+ document.getElementById("swords").innerHTML=`<div class="row"><button class="btn secondary" onclick="editingSword=null;renderSwords()">← 戻る</button><h1 style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:20px;margin:0">${s.id?'男士を編集':'男士を登録'}</h1><span></span></div>
+ <div class="card"><div class="field"><label>男士名</label>
+ <select id="s_master" onchange="document.getElementById('s_name').value=this.value==='__custom__'?'':this.value">
+ <option value="">実装済みの男士から選ぶ</option>${MASTER_SWORDS.map(n=>`<option value="${esc(n)}" ${preset===n?'selected':''}>${esc(n)}</option>`).join("")}<option value="__custom__">＋ 新しい名前を追加</option></select>
+ </div><div class="field" style="margin-top:10px"><label>記録する名前</label><input id="s_name" value="${esc(preset)}" placeholder="男士名を入力（新実装など）"></div>
+ <div class="formgrid" style="margin-top:10px"><div class="field"><label>お迎え日</label><input id="s_acq" type="date" value="${s.acquired||today()}"></div><div class="field"><label>お迎え時Lv</label><input id="s_start" type="number" inputmode="numeric" value="${s.startLevel??1}"></div></div>
+ <div class="field" style="margin-top:10px"><label>入手方法</label><select id="s_method"><option>鍛刀</option><option>ドロップ</option><option>イベント</option><option>引換所</option><option>その他</option><option>不明</option></select></div>
+ <div class="field" style="margin-top:10px"><label>メモ</label><textarea id="s_note">${esc(s.note||"")}</textarea></div>
+ <label style="display:block;margin-top:10px;font-size:12px"><input id="s_fav" type="checkbox" style="width:auto" ${s.favorite?'checked':''}> お気に入り</label>
+ <div class="actions"><button class="btn secondary" onclick="editingSword=null;renderSwords()">キャンセル</button><button class="btn" onclick="saveSword('${s.id||""}')">保存</button></div></div>
+ <div class="card"><div class="notice">同じ名前をもう一度登録すれば、二振り目・三振り目の育成記録も個別に管理できます。</div></div>`;
+ if(s.method)document.getElementById("s_method").value=s.method;
+}
+function saveSword(id){
+ const name=document.getElementById("s_name").value.trim();
+ const s={id:id||crypto.randomUUID(),name,acquired:document.getElementById("s_acq").value,startLevel:+document.getElementById("s_start").value||1,method:document.getElementById("s_method").value,note:document.getElementById("s_note").value.trim(),favorite:document.getElementById("s_fav").checked};
+ if(!name)return alert("男士名を選ぶか、入力してください。");
+ db.swords=db.swords.filter(x=>x.id!==s.id);db.swords.push(s);editingSword=null;save();
+}
+function latestLevel(id){return [...db.levels].filter(x=>x.swordId===id).sort((a,b)=>b.date.localeCompare(a.date))[0]}
+function renderSwordForm(s){
+ document.getElementById("swords").innerHTML=`<div class="row"><button class="btn secondary" onclick="editingSword=null;renderSwords()">← 戻る</button><h1 style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:20px;margin:0">${s.id?'男士を編集':'男士を登録'}</h1><span></span></div>
+ <div class="card"><div class="field"><label>男士名</label><input id="s_name" value="${esc(s.name||"")}"></div><div class="formgrid" style="margin-top:10px"><div class="field"><label>お迎え日</label><input id="s_acq" type="date" value="${s.acquired||today()}"></div><div class="field"><label>お迎え時Lv</label><input id="s_start" type="number" inputmode="numeric" value="${s.startLevel??1}"></div></div>
+ <div class="field" style="margin-top:10px"><label>入手方法</label><select id="s_method"><option>鍛刀</option><option>ドロップ</option><option>イベント</option><option>引換所</option><option>その他</option><option>不明</option></select></div>
+ <div class="field" style="margin-top:10px"><label>メモ</label><textarea id="s_note">${esc(s.note||"")}</textarea></div>
+ <label style="display:block;margin-top:10px;font-size:12px"><input id="s_fav" type="checkbox" style="width:auto" ${s.favorite?'checked':''}> お気に入り</label>
+ <div class="actions"><button class="btn secondary" onclick="editingSword=null;renderSwords()">キャンセル</button><button class="btn" onclick="saveSword('${s.id||""}')">保存</button></div></div>`;
+ if(s.method)document.getElementById("s_method").value=s.method;
+}
+function saveSword(id){
+ const s={id:id||crypto.randomUUID(),name:document.getElementById("s_name").value.trim(),acquired:document.getElementById("s_acq").value,startLevel:+document.getElementById("s_start").value||1,method:document.getElementById("s_method").value,note:document.getElementById("s_note").value.trim(),favorite:document.getElementById("s_fav").checked};
+ if(!s.name)return alert("男士名を入力してください。");
+ db.swords=db.swords.filter(x=>x.id!==s.id);db.swords.push(s);editingSword=null;save();
+}
+function openSword(id){
+ const s=db.swords.find(x=>x.id===id); if(!s)return;
+ document.getElementById("swords").innerHTML=`<div class="row"><button class="btn secondary" onclick="renderSwords()">← 戻る</button><button class="btn" onclick="editingSword=db.swords.find(x=>x.id==='${id}');renderSwords()">編集</button></div>
+ <div class="hero" style="margin-top:12px"><div class="date">${s.acquired?`お迎え：${s.acquired}`:"お迎え日未登録"}</div><h1>${s.favorite?'★ ':''}${esc(s.name)}</h1><p>${esc(s.method||"")}　・　お迎え時Lv.${s.startLevel||"—"}</p></div>
+ <div class="card"><div class="row"><h2>Lv記録</h2><button class="btn" onclick="openLevelForm('${id}')">＋Lvを記録</button></div>
+ ${levelRows(id)}</div>
+ <div class="card"><h2>お迎え記録</h2><div class="row"><span class="muted">お迎え日</span><b>${s.acquired||"—"}</b></div><div class="row" style="margin-top:8px"><span class="muted">入手方法</span><b>${esc(s.method||"—")}</b></div>${s.note?`<div class="notice" style="margin-top:10px">${esc(s.note)}</div>`:""}</div>`;
+}
+function levelRows(id){
+ const arr=[...db.levels].filter(x=>x.swordId===id).sort((a,b)=>b.date.localeCompare(a.date));
+ return arr.length?`<table class="table"><tr><th>日付</th><th>Lv</th><th>メモ</th><th></th></tr>${arr.map(x=>`<tr><td>${x.date}</td><td><b>${x.level}</b></td><td>${esc(x.note||"")}</td><td><button class="btn secondary icon" onclick="deleteLevel('${x.id}','${id}')">削除</button></td></tr>`).join("")}</table>`:'<div class="empty">Lv記録がありません。</div>';
+}
+function openLevelForm(id){
+ document.getElementById("swords").innerHTML+=`<div id="levelForm" class="card"><h2>Lvを記録</h2><div class="formgrid"><div class="field"><label>日付</label><input id="l_date" type="date" value="${today()}"></div><div class="field"><label>Lv</label><input id="l_level" type="number" inputmode="numeric" min="1" value="${latestLevel(id)?.level||db.swords.find(s=>s.id===id)?.startLevel||1}"></div></div><div class="field" style="margin-top:10px"><label>メモ</label><input id="l_note" placeholder="例：8-2周回"></div><div class="actions"><button class="btn secondary" onclick="document.getElementById('levelForm')?.remove()">キャンセル</button><button class="btn" onclick="saveLevel('${id}')">保存</button></div></div>`;
+ document.getElementById("levelForm").scrollIntoView({behavior:"smooth",block:"center"});
+}
+function saveLevel(id){const x={id:crypto.randomUUID(),swordId:id,date:document.getElementById("l_date").value,level:+document.getElementById("l_level").value||1,note:document.getElementById("l_note").value.trim()};db.levels=db.levels.filter(z=>!(z.swordId===id&&z.date===x.date));db.levels.push(x);save();openSword(id)}
+function deleteLevel(id,sid){db.levels=db.levels.filter(x=>x.id!==id);save();openSword(sid)}
+
+async function readLevelScreenshot(event){
+ const file=event.target.files?.[0]; if(!file)return;
+ const wrap=document.createElement("div"); wrap.id="lvOcrProgress"; wrap.className="card";
+ wrap.innerHTML='<h2>📸 Lvを読み取り中…</h2><div class="notice">部隊一覧の各行から「男士名」と「Lv」を読み取っています。初回はOCRエンジンの準備に少し時間がかかります。</div><div id="lvOcrStatus" class="muted" style="margin-top:8px">準備中…</div>';
+ document.getElementById("swords").prepend(wrap);
+ try{
+   const img=await loadImage(file);
+   // The supplied Touken Ranbu screenshot has six roster rows in the left half.
+   // These proportional crops intentionally leave out portraits/icons and the right-side character.
+   const rows=[.165,.293,.422,.551,.680,.809];
+   const results=[];
+   for(let i=0;i<rows.length;i++){
+     const y=rows[i];
+     const c=document.createElement("canvas");
+     c.width=Math.round(img.width*.39); c.height=Math.round(img.height*.115);
+     const ctx=c.getContext("2d");
+     ctx.drawImage(img,Math.round(img.width*.055),Math.round(img.height*(y-.025)),c.width,c.height,0,0,c.width,c.height);
+     document.getElementById("lvOcrStatus").textContent=`${i+1}/6人目を読み取り中…`;
+     const result=await Tesseract.recognize(c,"jpn+eng",{logger:m=>{}});
+     const text=result.data.text.replace(/\n+/g," ").trim();
+     const nums=[...text.matchAll(/(?:Lv\.?|LV\.?)\s*([0-9]{1,3})/gi)].map(m=>m[1]);
+     let level=nums.length?Number(nums[0]):null;
+     if(level===null){
+       const all=[...text.matchAll(/\b([0-9]{1,3})\b/g)].map(m=>Number(m[1])).filter(n=>n>=1&&n<=255);
+       level=all.find(n=>n>=40)??all[0]??null;
+     }
+     // Try to extract the Japanese name from text. The name is usually before "Lv".
+     let name=text.split(/Lv\.?|LV\.?/i)[0].replace(/[^一-龯ぁ-んァ-ヶー々ゝゞ・a-zA-Z]/g,"").trim();
+     if(!name) name="";
+     results.push({name,level,text});
+   }
+   wrap.remove();
+   openLevelOcrConfirm(results);
+ }catch(e){
+   wrap.innerHTML='<h2>読み取りできませんでした</h2><div class="notice">この画像から自動判定できませんでした。別のスクショを試すか、手入力をご利用ください。</div>';
+ }
+ event.target.value="";
+}
+function openLevelOcrConfirm(results){
+ const rows=results.map((r,i)=>{
+   const candidates=MASTER_SWORDS.filter(n=>!r.name||n.includes(r.name)||r.name.includes(n)).slice(0,5);
+   const exact=MASTER_SWORDS.includes(r.name)?r.name:(candidates[0]||"");
+   const options=[...new Set([exact,...candidates])].filter(Boolean);
+   return `<div class="item" style="margin-top:8px"><div class="muted">${i+1}人目</div>
+   <div class="formgrid"><div class="field"><label>男士名</label><input class="ocr-name" data-i="${i}" value="${esc(exact)}" list="masterNames"></div>
+   <div class="field"><label>現在Lv</label><input class="ocr-level" data-i="${i}" type="number" min="1" max="255" inputmode="numeric" value="${r.level??""}"></div></div>
+   <div class="notice" style="margin-top:5px">OCR原文：${esc(r.text||"—")}</div></div>`;
+ }).join("");
+ document.getElementById("swords").innerHTML=`<datalist id="masterNames">${MASTER_SWORDS.map(n=>`<option value="${esc(n)}">`).join("")}</datalist>
+ <div class="row"><button class="btn secondary" onclick="renderSwords()">← キャンセル</button><h1 style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:20px;margin:0">読み取り結果</h1><span></span></div>
+ <div class="card"><b>📸 Lv読み取り結果を確認</b><div class="notice">OCRは誤認識することがあります。名前とLvを直してから保存してください。既に同名の個体が1振りだけ登録されている場合は、その個体へ記録します。</div></div>
+ <div>${rows}</div><div class="card"><button class="btn full" onclick="saveOcrLevels()">確認して保存</button></div>`;
+}
+function saveOcrLevels(){
+ const ns=[...document.querySelectorAll(".ocr-name")], ls=[...document.querySelectorAll(".ocr-level")];
+ let saved=0, skipped=0;
+ ns.forEach((el,i)=>{
+   const name=el.value.trim(), level=Number(ls[i].value);
+   if(!name||!level){skipped++;return}
+   let owned=db.swords.filter(s=>s.name===name);
+   let sword=owned.length===1?owned[0]:null;
+   if(!sword){
+     // If not registered, create a new individual so the screenshot is not lost.
+     sword={id:crypto.randomUUID(),name,acquired:today(),startLevel:level,method:"その他",note:"Lvスクショから登録",favorite:false};
+     db.swords.push(sword);
+   }
+   db.levels=db.levels.filter(x=>!(x.swordId===sword.id&&x.date===today()));
+   db.levels.push({id:crypto.randomUUID(),swordId:sword.id,date:today(),level,note:"スクショから読み取り"});
+   saved++;
+ });
+ save(); showPage("swords");
+ if(skipped) setTimeout(()=>alert(`${saved}件を保存しました。読み取れなかった行はスキップしました。`),100);
+}
+function renderDaily(){
+ const dates=[...new Set([...db.resources.map(x=>x.date),...db.levels.map(x=>x.date)])].sort().reverse();
+ document.getElementById("daily").innerHTML=`<div><h1 style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:23px;margin:0">日別記録</h1><div class="muted">その日の資材とLvUPをまとめて確認。</div></div>
+ <div class="list" style="margin-top:12px">${dates.length?dates.map(d=>dailyCard(d)).join(""):'<div class="empty">まだ日別記録がありません。</div>'}</div>`;
+}
+function dailyCard(d){
+ const r=db.resources.find(x=>x.date===d), ls=db.levels.filter(x=>x.date===d);
+ return `<div class="card"><div class="row"><h2>${esc(d)}</h2><span class="muted">${ls.length} Lv記録</span></div>${r?resourceCards(r,resDelta(r,latestResBefore(d))):""}${ls.length?`<div style="margin-top:12px">${ls.map(x=>`<div class="item" style="margin-top:6px"><div class="row"><b>${esc(swordName(x.swordId))}</b><span>Lv.${x.level}</span></div>${x.note?`<div class="muted">${esc(x.note)}</div>`:""}</div>`).join("")}</div>`:""}</div>`
+}
+function renderSettings(){
+ document.getElementById("settings").innerHTML=`<div><h1 style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:23px;margin:0">その他</h1><div class="muted">データを守りながら、あとから機能を増やせる構造。</div></div>
+ <div class="card"><h2>データ管理</h2><button class="btn full" onclick="exportData()">JSONでバックアップ</button><div style="height:8px"></div><label class="btn secondary full" style="display:block;text-align:center">JSONを復元<input type="file" accept=".json,application/json" onchange="importData(event)" style="display:none"></label><p class="notice">記録はこのiPhoneのブラウザ内に保存されます。機種変更・Safariデータ削除に備えて、定期的にバックアップしてください。</p></div>
+ <div class="card"><h2>刀帳データ</h2><p class="notice">現在の実装済み刀剣男士128振りを初期登録しています。新実装の男士は「＋追加」から名前を入力して追加できます。</p></div><div class="card"><h2>これから追加できる機能</h2><span class="pill">8-2周回</span><span class="pill">周回数</span><span class="pill">経験値</span><span class="pill">極記録</span><span class="pill">修行日</span><span class="pill">CSV出力</span><span class="pill">資材グラフ強化</span><span class="pill">テーマ変更</span></div>
+ <div class="card"><h2>データを初期化</h2><button class="btn danger full" onclick="resetAll()">すべての記録を削除</button></div>`;
+}
+function exportData(){const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`刀帳日記_backup_${today()}.json`;a.click();URL.revokeObjectURL(a.href)}
+function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.resources||!x.swords||!x.levels)throw 0;db=x;save();alert("復元しました。")}catch(_){alert("このバックアップは読み込めません。")}};r.readAsText(f)}
+function resetAll(){if(confirm("すべての記録を削除します。バックアップはありますか？")){db={...empty};save()}}
+function showPage(p){currentPage=p;document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(p).classList.add("active");document.querySelectorAll(".navbtn").forEach(x=>x.classList.toggle("active",x.dataset.page===p));renderAll();window.scrollTo({top:0,behavior:"smooth"})}
+document.querySelectorAll(".navbtn").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+function renderAll(){renderHome();renderResources();renderSwords();renderDaily();renderSettings();document.getElementById(currentPage).classList.add("active")}
+if("serviceWorker" in navigator){
+ window.addEventListener("load",async()=>{
+   try{
+     const reg=await navigator.serviceWorker.register("sw.js?v=14",{updateViaCache:"none"});
+     if(reg.waiting) reg.waiting.postMessage({type:"SKIP_WAITING"});
+     navigator.serviceWorker.addEventListener("controllerchange",()=>{
+       if(!window.__swReloaded){window.__swReloaded=true;window.location.reload();}
+     });
+     reg.update().catch(()=>{});
+   }catch(e){}
+ });
+}
+renderAll();
+</script>
+</body>
+</html>
