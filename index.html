@@ -9,12 +9,13 @@
 <meta name="apple-mobile-web-app-title" content="刀帳日記">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon.svg">
-<title>刀帳日記 v17</title>
+<title>刀帳日記 v18</title>
 <style>
 :root{--ink:#20252b;--muted:#747b83;--paper:#fbfaf6;--card:#fff;--line:#e5e1d8;--navy:#172536;--pink:#b87886;--green:#5f8b76;--red:#b55f65;--shadow:0 5px 20px rgba(25,34,45,.08)}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#f5f2eb,#fbfaf6 45%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;-webkit-tap-highlight-color:transparent}
 button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:760px;margin:auto;min-height:100vh;padding-bottom:84px}
 header{padding:22px 18px 12px;position:sticky;top:0;z-index:5;background:rgba(251,250,246,.94);backdrop-filter:blur(12px);border-bottom:1px solid rgba(229,225,216,.7)}
+.appver{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;font-size:10px;font-weight:600;letter-spacing:.03em;color:var(--muted);vertical-align:middle;margin-left:5px}
 .brand{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:24px;font-weight:700;letter-spacing:.08em}.sub{font-size:11px;color:var(--muted);letter-spacing:.12em;margin-top:3px}
 main{padding:16px}.page{display:none}.page.active{display:block}.hero{background:linear-gradient(135deg,#1c2c40,#263c53);color:white;border-radius:22px;padding:20px;box-shadow:var(--shadow);margin-bottom:14px}
 .hero h1{margin:0 0 6px;font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:23px}.hero p{margin:0;color:#dbe3ea;font-size:13px}.date{font-size:12px;opacity:.8;margin-bottom:10px}
@@ -25,6 +26,7 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px
 .bottom{position:fixed;bottom:0;left:0;right:0;z-index:10;background:rgba(255,255,255,.96);border-top:1px solid var(--line);backdrop-filter:blur(14px)}.bottom-inner{max-width:760px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr)}.navbtn{border:0;background:transparent;padding:9px 3px 10px;color:#7a7f84;font-size:10px}.navbtn.active{color:var(--navy);font-weight:700}.navicon{display:block;font-size:18px;margin-bottom:2px}
 .search{margin-bottom:10px}.empty{text-align:center;padding:25px;color:var(--muted);font-size:13px}.sakura{color:var(--pink)}.right{margin-left:auto}.fav{color:#c58a28}.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{padding:9px 5px;border-bottom:1px solid var(--line);text-align:right}.table th:first-child,.table td:first-child{text-align:left}.chart{height:190px;overflow:hidden;border:1px solid var(--line);border-radius:14px;background:#fcfbf8}.chart svg{width:100%;height:100%}.notice{font-size:11px;color:var(--muted);line-height:1.7}
 .goal-list{display:flex;flex-direction:column;gap:12px}.goal-head{display:flex;justify-content:space-between;gap:10px;align-items:baseline}.goal-track{height:12px;background:#f5e5ea;border-radius:999px;overflow:hidden;margin-top:6px}.goal-fill{height:100%;background:linear-gradient(90deg,#e58aa4,#d85f83);border-radius:999px;transition:width .25s}.goal-done{font-weight:700;color:#b64f70}.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.goal-grid .field:last-child{grid-column:1/-1}
+.form-status{display:flex;gap:8px;margin-top:6px}.form-status button{flex:1;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff;color:var(--muted);font-weight:700}.form-status button.active{background:var(--pink);border-color:var(--pink);color:#fff}.status-badge{display:inline-block;border:1px solid #e7b8c6;background:#fff1f5;color:#a84f6a;border-radius:999px;padding:2px 7px;font-size:10px;font-weight:700;margin-left:5px}
 @media(max-width:420px){.grid4{gap:5px}.resource{padding:9px 3px}.resource .num{font-size:14px}.formgrid{grid-template-columns:1fr}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -43,7 +45,7 @@ header{background:rgba(255,250,251,.94);border-bottom-color:#f0dfe4}
 </head>
 <body>
 <div class="app">
-<header><div class="brand">刀帳日記</div><div class="sub">資材と、育成の記録を、ともに。</div></header>
+<header><div class="brand">刀帳日記 <small class="appver">v18</small></div><div class="sub">資材と、育成の記録を、ともに。</div></header>
 <main>
 <section id="home" class="page active"></section>
 <section id="resources" class="page"></section>
@@ -65,7 +67,7 @@ const KEY="toukenDiary_v1";
 const empty={resources:[],swords:[],levels:[],memos:[],settings:{theme:"light"}};
 const MASTER_SWORDS=["今剣", "平野藤四郎", "厚藤四郎", "後藤藤四郎", "信濃藤四郎", "前田藤四郎", "秋田藤四郎", "博多藤四郎", "乱藤四郎", "五虎退", "薬研藤四郎", "包丁藤四郎", "愛染国俊", "太鼓鐘貞宗", "小夜左文字", "不動行光", "毛利藤四郎", "謙信景光", "日向正宗", "北谷菜切", "太閤左文字", "京極正宗", "九鬼正宗", "倶利伽羅江", "にっかり青江", "鯰尾藤四郎", "骨喰藤四郎", "物吉貞宗", "堀川国広", "浦島虎徹", "篭手切江", "肥前忠広", "治金丸", "泛塵", "火車切", "鳴狐", "千子村正", "亀甲貞宗", "宗三左文字", "加州清光", "大和守安定", "歌仙兼定", "和泉守兼定", "陸奥守吉行", "山姥切国広", "蜂須賀虎徹", "長曽祢虎徹", "大倶利伽羅", "へし切長谷部", "同田貫正国", "南泉一文字", "山姥切長義", "豊前江", "南海太郎朝尊", "桑名江", "水心子正秀", "源清麿", "松井江", "地蔵行平", "五月雨江", "村雲江", "稲葉江", "石田正宗", "孫六兼元", "後家兼光", "富田江", "大慶直胤", "安宅切", "二筋樋貞宗", "雲重", "童子切安綱 剥落", "三日月宗近", "小狐丸", "大典太光世", "ソハヤノツルキ", "数珠丸恒次", "鬼丸国綱", "一期一振", "大包平", "鶯丸", "明石国行", "燭台切光忠", "大般若長光", "小竜景光", "江雪左文字", "山伏国広", "髭切", "膝丸", "獅子王", "小烏丸", "抜丸", "鶴丸国永", "小豆長光", "千代金丸", "山鳥毛", "古今伝授の太刀", "日光一文字", "一文字則宗", "姫鶴一文字", "福島光忠", "笹貫", "八丁念仏", "実休光忠", "雲生", "道誉一文字", "雲次", "面影", "古備前信房", "三郎国宗", "波平行安", "狐ヶ崎為次", "石切丸", "蛍丸", "太郎太刀", "次郎太刀", "祢々切丸", "柏太刀", "蜻蛉切", "日本号", "御手杵", "大千鳥十文字槍", "人間無骨", "岩融", "巴形薙刀", "静形薙刀", "白山吉光", "七星剣", "丙子椒林剣"];
 let db=load(); let currentPage="home"; let resourceMode="list"; let editingSword=null;
-function load(){try{const x={...empty,...JSON.parse(localStorage.getItem(KEY)||"{}")};x.resources=(x.resources||[]).map(r=>({...r,koushu:r.koushu??"",koban:r.koban??""}));return x}catch(e){return {...empty}}}
+function load(){try{const x={...empty,...JSON.parse(localStorage.getItem(KEY)||"{}")};x.resources=(x.resources||[]).map(r=>({...r,koushu:r.koushu??"",koban:r.koban??""}));x.swords=(x.swords||[]).map(s=>({...s,form:s.form||"初"}));return x}catch(e){return {...empty}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(db)); renderAll()}
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 function fmt(n){return Number(n||0).toLocaleString("ja-JP")}
@@ -289,7 +291,7 @@ function getSwordListData(){
 function swordListHtml(){
  const {owned,ownedNames,list}=getSwordListData();
  return swordMode==="owned"?`
- <div class="list">${list.length?list.map(s=>`<div class="item" onclick="openSword('${s.id}')"><div class="row"><div><b>${s.favorite?'★ ':''}${esc(s.name)}</b><div class="muted">Lv.${latestLevel(s.id)?.level??s.startLevel??'—'}　・ ${s.acquired?`お迎え ${esc(s.acquired)}`:"お迎え日未登録"}</div></div><span>›</span></div></div>`).join(""):'<div class="empty">まだ所持記録がありません。<br>「刀帳」から登録すると、すぐ記録を始められます。</div>'}</div>`
+ <div class="list">${list.length?list.map(s=>`<div class="item" onclick="openSword('${s.id}')"><div class="row"><div><b>${s.favorite?'★ ':''}${esc(s.name)} <span class="status-badge">${esc(s.form||'初')}</span></b><div class="muted">Lv.${latestLevel(s.id)?.level??s.startLevel??'—'}　・ ${s.acquired?`お迎え ${esc(s.acquired)}`:"お迎え日未登録"}</div></div><span>›</span></div></div>`).join(""):'<div class="empty">まだ所持記録がありません。<br>「刀帳」から登録すると、すぐ記録を始められます。</div>'}</div>`
  :`
  <div class="card"><div class="notice">ここには現在実装済みの128振りを登録してあります。未所持でもOK。名前をタップすると、その男士を1振り登録できます。二振り目以降も同じ名前から追加できます。</div></div>
  <div class="list">${list.map(n=>`<div class="item" onclick="quickRegisterMaster('${encodeURIComponent(n)}')"><div class="row"><div><b>${esc(n)}</b><div class="muted">${ownedNames.has(n)?'登録済みの個体あり':'未登録'}</div></div><span>＋</span></div></div>`).join("")}</div>`;
@@ -331,6 +333,7 @@ function renderSwordForm(s){
  <select id="s_master" onchange="document.getElementById('s_name').value=this.value==='__custom__'?'':this.value">
  <option value="">実装済みの男士から選ぶ</option>${MASTER_SWORDS.map(n=>`<option value="${esc(n)}" ${preset===n?'selected':''}>${esc(n)}</option>`).join("")}<option value="__custom__">＋ 新しい名前を追加</option></select>
  </div><div class="field" style="margin-top:10px"><label>記録する名前</label><input id="s_name" value="${esc(preset)}" placeholder="男士名を入力（新実装など）"></div>
+ <div class="field" style="margin-top:10px"><label>形態</label><input id="s_form" type="hidden" value="${esc(s.form||'初')}"><div class="form-status"><button type="button" id="form_initial" class="${(s.form||'初')==='初'?'active':''}" onclick="setSwordForm('初')">初</button><button type="button" id="form_kiwame" class="${s.form==='極'?'active':''}" onclick="setSwordForm('極')">極</button></div></div>
  <div class="formgrid" style="margin-top:10px"><div class="field"><label>お迎え日</label><input id="s_acq" type="date" value="${s.acquired||today()}"></div><div class="field"><label>お迎え時Lv</label><input id="s_start" type="number" inputmode="numeric" value="${s.startLevel??1}"></div></div>
  <div class="field" style="margin-top:10px"><label>入手方法</label><select id="s_method"><option>鍛刀</option><option>ドロップ</option><option>イベント</option><option>引換所</option><option>その他</option><option>不明</option></select></div>
  <div class="field" style="margin-top:10px"><label>メモ</label><textarea id="s_note">${esc(s.note||"")}</textarea></div>
@@ -339,16 +342,18 @@ function renderSwordForm(s){
  <div class="card"><div class="notice">同じ名前をもう一度登録すれば、二振り目・三振り目の育成記録も個別に管理できます。</div></div>`;
  if(s.method)document.getElementById("s_method").value=s.method;
 }
+function setSwordForm(value){const el=document.getElementById('s_form');if(el)el.value=value;document.getElementById('form_initial')?.classList.toggle('active',value==='初');document.getElementById('form_kiwame')?.classList.toggle('active',value==='極');}
 function saveSword(id){
  const name=document.getElementById("s_name").value.trim();
- const s={id:id||crypto.randomUUID(),name,acquired:document.getElementById("s_acq").value,startLevel:+document.getElementById("s_start").value||1,method:document.getElementById("s_method").value,note:document.getElementById("s_note").value.trim(),favorite:document.getElementById("s_fav").checked};
+ const s={id:id||crypto.randomUUID(),name,acquired:document.getElementById("s_acq").value,startLevel:+document.getElementById("s_start").value||1,method:document.getElementById("s_method").value,note:document.getElementById("s_note").value.trim(),favorite:document.getElementById("s_fav").checked,form:document.getElementById("s_form")?.value||"初"};
  if(!name)return alert("男士名を選ぶか、入力してください。");
  db.swords=db.swords.filter(x=>x.id!==s.id);db.swords.push(s);editingSword=null;save();
 }
 function latestLevel(id){return [...db.levels].filter(x=>x.swordId===id).sort((a,b)=>b.date.localeCompare(a.date))[0]}
 function renderSwordForm(s){
  document.getElementById("swords").innerHTML=`<div class="row"><button class="btn secondary" onclick="editingSword=null;renderSwords()">← 戻る</button><h1 style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:20px;margin:0">${s.id?'男士を編集':'男士を登録'}</h1><span></span></div>
- <div class="card"><div class="field"><label>男士名</label><input id="s_name" value="${esc(s.name||"")}"></div><div class="formgrid" style="margin-top:10px"><div class="field"><label>お迎え日</label><input id="s_acq" type="date" value="${s.acquired||today()}"></div><div class="field"><label>お迎え時Lv</label><input id="s_start" type="number" inputmode="numeric" value="${s.startLevel??1}"></div></div>
+ <div class="card"><div class="field"><label>男士名</label><input id="s_name" value="${esc(s.name||"")}"></div><div class="field" style="margin-top:10px"><label>形態</label><input id="s_form" type="hidden" value="${esc(s.form||'初')}"><div class="form-status"><button type="button" id="form_initial" class="${(s.form||'初')==='初'?'active':''}" onclick="setSwordForm('初')">初</button><button type="button" id="form_kiwame" class="${s.form==='極'?'active':''}" onclick="setSwordForm('極')">極</button></div></div>
+ <div class="formgrid" style="margin-top:10px"><div class="field"><label>お迎え日</label><input id="s_acq" type="date" value="${s.acquired||today()}"></div><div class="field"><label>お迎え時Lv</label><input id="s_start" type="number" inputmode="numeric" value="${s.startLevel??1}"></div></div>
  <div class="field" style="margin-top:10px"><label>入手方法</label><select id="s_method"><option>鍛刀</option><option>ドロップ</option><option>イベント</option><option>引換所</option><option>その他</option><option>不明</option></select></div>
  <div class="field" style="margin-top:10px"><label>メモ</label><textarea id="s_note">${esc(s.note||"")}</textarea></div>
  <label style="display:block;margin-top:10px;font-size:12px"><input id="s_fav" type="checkbox" style="width:auto" ${s.favorite?'checked':''}> お気に入り</label>
@@ -356,14 +361,14 @@ function renderSwordForm(s){
  if(s.method)document.getElementById("s_method").value=s.method;
 }
 function saveSword(id){
- const s={id:id||crypto.randomUUID(),name:document.getElementById("s_name").value.trim(),acquired:document.getElementById("s_acq").value,startLevel:+document.getElementById("s_start").value||1,method:document.getElementById("s_method").value,note:document.getElementById("s_note").value.trim(),favorite:document.getElementById("s_fav").checked};
+ const s={id:id||crypto.randomUUID(),name:document.getElementById("s_name").value.trim(),acquired:document.getElementById("s_acq").value,startLevel:+document.getElementById("s_start").value||1,method:document.getElementById("s_method").value,note:document.getElementById("s_note").value.trim(),favorite:document.getElementById("s_fav").checked,form:document.getElementById("s_form")?.value||"初"};
  if(!s.name)return alert("男士名を入力してください。");
  db.swords=db.swords.filter(x=>x.id!==s.id);db.swords.push(s);editingSword=null;save();
 }
 function openSword(id){
  const s=db.swords.find(x=>x.id===id); if(!s)return;
  document.getElementById("swords").innerHTML=`<div class="row"><button class="btn secondary" onclick="renderSwords()">← 戻る</button><button class="btn" onclick="editingSword=db.swords.find(x=>x.id==='${id}');renderSwords()">編集</button></div>
- <div class="hero" style="margin-top:12px"><div class="date">${s.acquired?`お迎え：${s.acquired}`:"お迎え日未登録"}</div><h1>${s.favorite?'★ ':''}${esc(s.name)}</h1><p>${esc(s.method||"")}　・　お迎え時Lv.${s.startLevel||"—"}</p></div>
+ <div class="hero" style="margin-top:12px"><div class="date">${s.acquired?`お迎え：${s.acquired}`:"お迎え日未登録"}</div><h1>${s.favorite?'★ ':''}${esc(s.name)} <span class="status-badge">${esc(s.form||'初')}</span></h1><p>${esc(s.method||"")}　・　お迎え時Lv.${s.startLevel||"—"}</p></div>
  <div class="card"><div class="row"><h2>Lv記録</h2><button class="btn" onclick="openLevelForm('${id}')">＋Lvを記録</button></div>
  ${levelRows(id)}</div>
  <div class="card"><h2>お迎え記録</h2><div class="row"><span class="muted">お迎え日</span><b>${s.acquired||"—"}</b></div><div class="row" style="margin-top:8px"><span class="muted">入手方法</span><b>${esc(s.method||"—")}</b></div>${s.note?`<div class="notice" style="margin-top:10px">${esc(s.note)}</div>`:""}</div>`;
@@ -442,7 +447,7 @@ function saveOcrLevels(){
    let sword=owned.length===1?owned[0]:null;
    if(!sword){
      // If not registered, create a new individual so the screenshot is not lost.
-     sword={id:crypto.randomUUID(),name,acquired:today(),startLevel:level,method:"その他",note:"Lvスクショから登録",favorite:false};
+     sword={id:crypto.randomUUID(),name,acquired:today(),startLevel:level,method:"その他",note:"Lvスクショから登録",favorite:false,form:"初"};
      db.swords.push(sword);
    }
    db.levels=db.levels.filter(x=>!(x.swordId===sword.id&&x.date===today()));
@@ -464,7 +469,7 @@ function dailyCard(d){
 function renderSettings(){
  document.getElementById("settings").innerHTML=`<div><h1 style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:23px;margin:0">その他</h1><div class="muted">データを守りながら、あとから機能を増やせる構造。</div></div>
  <div class="card"><h2>データ管理</h2><button class="btn full" onclick="exportData()">JSONでバックアップ</button><div style="height:8px"></div><label class="btn secondary full" style="display:block;text-align:center">JSONを復元<input type="file" accept=".json,application/json" onchange="importData(event)" style="display:none"></label><p class="notice">記録はこのiPhoneのブラウザ内に保存されます。機種変更・Safariデータ削除に備えて、定期的にバックアップしてください。</p></div>
- <div class="card"><h2>刀帳データ</h2><p class="notice">現在の実装済み刀剣男士128振りを初期登録しています。新実装の男士は「＋追加」から名前を入力して追加できます。</p></div><div class="card"><h2>これから追加できる機能</h2><span class="pill">8-2周回</span><span class="pill">周回数</span><span class="pill">経験値</span><span class="pill">極記録</span><span class="pill">修行日</span><span class="pill">CSV出力</span><span class="pill">資材グラフ強化</span><span class="pill">テーマ変更</span></div>
+ <div class="card"><h2>刀帳データ</h2><p class="notice">現在の実装済み刀剣男士128振りを初期登録しています。新実装の男士は「＋追加」から名前を入力して追加できます。</p></div><div class="card"><h2>これから追加できる機能</h2><span class="pill">8-2周回</span><span class="pill">周回数</span><span class="pill">経験値</span><span class="pill">修行日</span><span class="pill">CSV出力</span><span class="pill">資材グラフ強化</span><span class="pill">テーマ変更</span></div>
  <div class="card"><h2>データを初期化</h2><button class="btn danger full" onclick="resetAll()">すべての記録を削除</button></div>`;
 }
 function exportData(){const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`刀帳日記_backup_${today()}.json`;a.click();URL.revokeObjectURL(a.href)}
